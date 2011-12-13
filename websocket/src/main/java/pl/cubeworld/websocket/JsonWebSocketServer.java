@@ -1,6 +1,5 @@
 package pl.cubeworld.websocket;
 
-import java.io.IOException;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -8,10 +7,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.reflections.Reflections;
-
 import net.tootallnate.websocket.WebSocket;
 import net.tootallnate.websocket.WebSocketServer;
+
+import org.reflections.Reflections;
 
 public class JsonWebSocketServer extends WebSocketServer {
 	private Map<Type, Action> actions = new HashMap<Type, Action>();
@@ -36,13 +35,6 @@ public class JsonWebSocketServer extends WebSocketServer {
 		Object obj = adjuster.parse(message);
 		Invoker invoker = new Invoker(actions);
 		invoker.invoke(obj, webSocket);
-		
-//		try {
-//			webSocket.send("Hello");
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
 
 	}
 
