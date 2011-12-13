@@ -5,9 +5,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Collection;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.gson.Gson;
 
 public class AdjustObject {
+	private static final Logger logger = LoggerFactory.getLogger(AdjustObject.class);
 
 	private final Collection<Type> objects;
 	private Gson gson = new Gson();
@@ -19,7 +23,6 @@ public class AdjustObject {
 	public Object parse(String json) {
 		for (Type type : objects) {
 			Object object = gson.fromJson(json, type);
-			//System.out.println(object);
 			if (!isNull(object)) {
 				return object;
 			}
@@ -31,10 +34,9 @@ public class AdjustObject {
 		Method[] methods = object.getClass().getDeclaredMethods();
 		for (Method method : methods) {
 			if (method.getParameterTypes().length == 0 && method.getName().startsWith("get")) {
-				//System.out.println("Method name: " + method.getName());
+				//logger.debug("Method name: " + method.getName());
 				try {
 					Object result = method.invoke(object);
-					//System.out.println("Method result " + result);
 					if(result==null){
 						return true;
 					}

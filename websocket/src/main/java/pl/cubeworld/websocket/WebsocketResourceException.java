@@ -7,16 +7,16 @@ public class WebsocketResourceException extends Exception {
 		super();
 	}
 
-	public WebsocketResourceException(String arg0, Throwable arg1) {
-		super(arg0, arg1);
+	public WebsocketResourceException(String message, Throwable throwable) {
+		super(message, throwable);
 	}
 
-	public WebsocketResourceException(String arg0) {
-		super(arg0);
+	public WebsocketResourceException(String message) {
+		super(message);
 	}
 
-	public WebsocketResourceException(Throwable arg0) {
-		super(arg0);
+	public WebsocketResourceException(Throwable throwable) {
+		super(throwable);
 	}
 
 }

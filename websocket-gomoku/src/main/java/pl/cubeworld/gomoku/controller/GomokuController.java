@@ -4,16 +4,22 @@ import java.io.IOException;
 import java.util.Stack;
 
 import net.tootallnate.websocket.WebSocket;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import pl.cubeworld.gomoku.entity.Connect;
 import pl.cubeworld.websocket.WebsocketReply;
 import pl.cubeworld.websocket.WebsocketResource;
 
 @WebsocketResource(path="/path")
 public class GomokuController {
+	private static final Logger logger = LoggerFactory.getLogger(GomokuController.class);
+	
 	private Stack<WebsocketReply> waitingUsers = new Stack<WebsocketReply>();
 	
 	public void connect(Connect connect, WebsocketReply reply){
-		System.out.println("Game controller connect: " + connect);
+		logger.info("Game controller connect: " + connect);
 		waitingUsers.push(reply);
 		
 		if(waitingUsers.size() >= 2){
@@ -23,7 +29,7 @@ public class GomokuController {
 
 	//TODO private method should not be find by annotation scanner
 	private void startGame(WebsocketReply user1, WebsocketReply user2, WebSocket current) {
-		System.out.println("Game started user1: " + user1 + " user2: " + user2);
+		logger.info("Game started user1: " + user1 + " user2: " + user2);
 		try {
 			user1.replyRaw("Game is started 1");
 			user2.replyRaw("Game is started 2");
