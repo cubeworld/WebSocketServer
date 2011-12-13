@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import com.google.gson.Gson;
 
+import pl.cubeworld.websocket.AdjustObject;
 import pl.cubeworld.websocket.annotation.Book;
 import pl.cubeworld.websocket.annotation.Person;
 

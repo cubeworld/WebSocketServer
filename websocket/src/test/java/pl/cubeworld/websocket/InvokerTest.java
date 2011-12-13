@@ -15,16 +15,17 @@ import net.tootallnate.websocket.WebSocket;
 import org.junit.Test;
 
 import pl.cubeworld.websocket.annotation.Book;
+import pl.cubeworld.websocket.model.TestController;
 
 public class InvokerTest {
 
 	@Test
 	public void testName() throws Exception {
 		// given
-		AnnotatedClass annotatedClassMocked = mock(AnnotatedClass.class);
+		TestController annotatedClassMocked = mock(TestController.class);
 		Book book = new Book();
 
-		Method method = AnnotatedClass.class.getMethod("login", Book.class, WebSocket.class);
+		Method method = TestController.class.getMethod("login", Book.class, WebSocket.class);
 		Map<Type, Action> actions = new HashMap<Type, Action>();
 		actions.put(Book.class, new Action(annotatedClassMocked, method));
 
