@@ -34,7 +34,8 @@ public class JsonWebSocketServer extends WebSocketServer {
 		AdjustObject adjuster = new AdjustObject(actions.keySet());
 		Object obj = adjuster.parse(message);
 		Invoker invoker = new Invoker(actions);
-		invoker.invoke(obj, webSocket);
+		WebsocketReply reply = new WebsocketReply(webSocket);
+		invoker.invoke(obj, reply);
 
 	}
 

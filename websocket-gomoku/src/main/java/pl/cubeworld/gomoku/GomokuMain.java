@@ -6,7 +6,7 @@ import pl.cubeworld.websocket.JsonWebSocketServer;
  * Hello world!
  * 
  */
-public class WebsocketGomoku {
+public class GomokuMain {
 	public static void main(String[] args) {
 		int port = 8887;
 		String scannedPacket = "pl.cubeworld.gomoku.controller";
