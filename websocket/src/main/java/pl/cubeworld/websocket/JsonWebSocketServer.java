@@ -1,24 +1,26 @@
 package pl.cubeworld.websocket;
 
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import net.tootallnate.websocket.WebSocket;
 import net.tootallnate.websocket.WebSocketServer;
 
-import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class JsonWebSocketServer extends WebSocketServer {
-	private static final Logger logger = LoggerFactory.getLogger(JsonWebSocketServer.class);
-	
+	private static final Logger logger = LoggerFactory
+			.getLogger(JsonWebSocketServer.class);
+
 	private Map<Type, Action> actions = new HashMap<Type, Action>();
 	private final String scannedPacket;
+
+	private Set<WebSocket> webSockets = new HashSet<WebSocket>();
 
 	public JsonWebSocketServer(int port, String scannedPacket) {
 		super(port);
@@ -26,69 +28,66 @@ public class JsonWebSocketServer extends WebSocketServer {
 	}
 
 	@Override
-	public void onClientClose(WebSocket arg0) {
+	public void onClientClose(WebSocket webSocket) {
 		logger.debug("onClientClose");
+		webSockets.remove(webSocket);
+		logger.debug("WebSockets set size: " + webSockets.size());
 
 	}
 
 	@Override
 	public void onClientMessage(WebSocket webSocket, String message) {
 		logger.debug("onClientMessage");
+		if (!webSockets.contains(webSocket)) {
+			throw new IllegalStateException("Web socket " + webSocket + " should be created befere onClienetMessage method");
+		}
 
-		AdjustObject adjuster = new AdjustObject(actions.keySet());
-		Object obj = adjuster.parse(message);
-		Invoker invoker = new Invoker(actions);
+		EntityResolver resolver = new EntityResolver(actions.keySet());
+		Object entity = resolver.parse(message);
+
 		WebsocketReply reply = new WebsocketReply(webSocket);
-		invoker.invoke(obj, reply);
+		
+		ActionInvoker invoker = new ActionInvoker(actions);
+		invoker.invoke(entity, reply);
 
 	}
 
 	@Override
-	public void onClientOpen(WebSocket arg0) {
+	public void onClientOpen(WebSocket webSocket) {
 		logger.debug("onClientOpen");
+		if (webSockets.contains(webSocket)) {
+			logger.debug("WebSocket have been already stored");
+			return;
+		}
+		webSockets.add(webSocket);
+		logger.debug("WebSockets set size: " + webSockets.size());
 
 	}
 
 	@Override
-	public void onError(Throwable arg0) {
+	public void onError(Throwable throwable) {
 		logger.debug("onError");
-
+		logger.error("onError", throwable);
 	}
 
 	@Override
 	public void start() {
-		Reflections reflections = new Reflections(scannedPacket);
-		Set<Class<?>> typeAnnotated = reflections
-				.getTypesAnnotatedWith(WebsocketResource.class);
-		logger.debug("Length: " + typeAnnotated.size());
-		for (Class<?> clazz : typeAnnotated) {
+		WebSocketControllerScanner scanner = new WebSocketControllerScanner(
+				scannedPacket);
+		List<WebSocketControllerDescription> controllerDescriptions = scanner
+				.scan();
 
-			logger.debug("Annotated class: " + clazz.getName());
-			final AnnotatedElement myClass = clazz;
-			WebsocketResource annotation = myClass
-					.getAnnotation(WebsocketResource.class);
-
-			String path = annotation.path();
-			logger.debug("Path: " + path);
-
-			for (Method method : clazz.getDeclaredMethods()) {
-				try {
-					Type[] parameterTypes = method.getGenericParameterTypes();
-					if (parameterTypes.length >= 1 && parameterTypes.length <= 2) {
-						logger.info("Method is websocket action: "
-								+ method.getName());
-
-						Object webResourceObject = clazz.getConstructor()
-								.newInstance();
-						Type messageType = parameterTypes[0];
-						logger.info("Message type: " + messageType);
-						actions.put(messageType, new Action(webResourceObject,
-								method));
-					}
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-
+		for (WebSocketControllerDescription controllerDescription : controllerDescriptions) {
+			try{
+			Object webResourceObject = controllerDescription
+					.getControllerClass().getConstructor().newInstance();
+			for (ActionMethod actionMethod : controllerDescription
+					.getActionMethods()) {
+				actions.put(actionMethod.getEntity(), new Action(
+						webResourceObject, actionMethod.getMethod()));
+			}
+			} catch (Exception ex){
+				logger.warn("Controller " + controllerDescription + " cannot be created");
 			}
 		}
 

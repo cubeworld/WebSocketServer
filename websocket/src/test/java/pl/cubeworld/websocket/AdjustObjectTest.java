@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import com.google.gson.Gson;
 
-import pl.cubeworld.websocket.AdjustObject;
+import pl.cubeworld.websocket.EntityResolver;
 import pl.cubeworld.websocket.annotation.Book;
 import pl.cubeworld.websocket.annotation.Person;
 
@@ -33,7 +33,7 @@ public class AdjustObjectTest {
 		expectedPerson.setName("Pawe¸ W«grzyÄski");
 		
 		//when
-		AdjustObject adjuster = new AdjustObject(objects);
+		EntityResolver adjuster = new EntityResolver(objects);
 		
 		Person person = (Person)adjuster.parse(json);
 		
@@ -54,7 +54,7 @@ public class AdjustObjectTest {
 		expectedBook.setTitle("Little Princes");
 		
 		//when
-		AdjustObject adjuster = new AdjustObject(objects);
+		EntityResolver adjuster = new EntityResolver(objects);
 		Book book = (Book)adjuster.parse(json);
 		
 		//then
@@ -74,7 +74,7 @@ public class AdjustObjectTest {
 		expectedPerson.setName("Pawe¸ W«grzyÄski");
 		
 		//when
-		AdjustObject adjuster = new AdjustObject(objects);
+		EntityResolver adjuster = new EntityResolver(objects);
 		
 		Person person = (Person)adjuster.parse(json);
 		
@@ -95,7 +95,7 @@ public class AdjustObjectTest {
 		expectedBook.setTitle("Little Princes");
 		
 		//when
-		AdjustObject adjuster = new AdjustObject(objects);
+		EntityResolver adjuster = new EntityResolver(objects);
 		Book book = (Book)adjuster.parse(json);
 		
 		//then

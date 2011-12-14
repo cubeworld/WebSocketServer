@@ -13,7 +13,7 @@ import java.util.Map;
 import org.junit.Test;
 
 import pl.cubeworld.websocket.annotation.Book;
-import pl.cubeworld.websocket.model.TestController;
+import pl.cubeworld.websocket.controllers.TestController;
 
 public class InvokerTest {
 
@@ -30,7 +30,7 @@ public class InvokerTest {
 		WebsocketReply reply = mock(WebsocketReply.class);
 
 		// when
-		Invoker invoker = new Invoker(actions);
+		ActionInvoker invoker = new ActionInvoker(actions);
 		invoker.invoke(book, reply);
 
 		// then

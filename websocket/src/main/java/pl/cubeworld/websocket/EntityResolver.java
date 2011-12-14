@@ -10,13 +10,13 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 
-public class AdjustObject {
-	private static final Logger logger = LoggerFactory.getLogger(AdjustObject.class);
+public class EntityResolver {
+	private static final Logger logger = LoggerFactory.getLogger(EntityResolver.class);
 
 	private final Collection<Type> objects;
 	private Gson gson = new Gson();
 
-	public AdjustObject(Collection<Type> objects) {
+	public EntityResolver(Collection<Type> objects) {
 		this.objects = objects;
 	}
 

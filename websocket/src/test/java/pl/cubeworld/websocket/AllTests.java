@@ -7,7 +7,9 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
         AdjustObjectTest.class,
-        InvokerTest.class
+        InvokerTest.class,
+        WebSocketControllerScannerTest.class,
+        WebSocketControllerDescriptionTest.class
 })
 public class AllTests {
 

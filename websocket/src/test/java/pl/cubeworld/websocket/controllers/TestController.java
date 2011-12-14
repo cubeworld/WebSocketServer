@@ -1,4 +1,4 @@
-package pl.cubeworld.websocket.model;
+package pl.cubeworld.websocket.controllers;
 
 import pl.cubeworld.websocket.WebsocketReply;
 import pl.cubeworld.websocket.WebsocketResource;
