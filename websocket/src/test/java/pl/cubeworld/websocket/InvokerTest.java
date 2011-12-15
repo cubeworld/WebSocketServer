@@ -6,9 +6,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Test;
 
@@ -24,13 +21,12 @@ public class InvokerTest {
 		Book book = new Book();
 
 		Method method = TestController.class.getMethod("login", Book.class, WebsocketReply.class);
-		Map<Type, Action> actions = new HashMap<Type, Action>();
-		actions.put(Book.class, new Action(annotatedClassMocked, method));
+		Action action = new Action(annotatedClassMocked, method);
 		
 		WebsocketReply reply = mock(WebsocketReply.class);
 
 		// when
-		ActionInvoker invoker = new ActionInvoker(actions);
+		ActionInvoker invoker = new ActionInvoker(action);
 		invoker.invoke(book, reply);
 
 		// then

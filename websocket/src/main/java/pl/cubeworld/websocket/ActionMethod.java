@@ -4,11 +4,12 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 public class ActionMethod {
+	private final Class<?> clazz;
 	private final Method method;
 	private final Type entity;
 	
-	public ActionMethod(Method method, Type entity) {
-		super();
+	public ActionMethod(Class<?> clazz, Method method, Type entity) {
+		this.clazz = clazz;
 		this.method = method;
 		this.entity = entity;
 	}
@@ -19,6 +20,10 @@ public class ActionMethod {
 
 	public Type getEntity() {
 		return entity;
+	}
+
+	public Class<?> getClazz() {
+		return clazz;
 	}
 
 	@Override

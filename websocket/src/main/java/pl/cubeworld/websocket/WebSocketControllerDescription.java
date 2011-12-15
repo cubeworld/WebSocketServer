@@ -35,7 +35,7 @@ public class WebSocketControllerDescription {
 			if (parameterTypes.length >= 1 && parameterTypes.length <= 2) {
 				logger.info("Method is websocket action: " + method.getName());
 				Type entityType = parameterTypes[0];
-				actionMethods.add(new ActionMethod(method, entityType));
+				actionMethods.add(new ActionMethod(controllerClass, method, entityType));
 			}
 		}
 		return actionMethods;

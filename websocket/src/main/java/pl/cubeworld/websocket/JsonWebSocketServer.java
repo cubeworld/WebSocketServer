@@ -1,6 +1,7 @@
 package pl.cubeworld.websocket;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -17,10 +18,12 @@ public class JsonWebSocketServer extends WebSocketServer {
 	private static final Logger logger = LoggerFactory
 			.getLogger(JsonWebSocketServer.class);
 
-	private Map<Type, Action> actions = new HashMap<Type, Action>();
 	private final String scannedPacket;
 
-	private Set<WebSocket> webSockets = new HashSet<WebSocket>();
+	private List<ActionMethod> actionMethods = new ArrayList<ActionMethod>();
+	private Set<Type>  entities = new HashSet<Type>();
+	private Map<WebSocket, Map<Type, Action>> clientMap = new HashMap<WebSocket, Map<Type,Action>>();
+
 
 	public JsonWebSocketServer(int port, String scannedPacket) {
 		super(port);
@@ -30,24 +33,28 @@ public class JsonWebSocketServer extends WebSocketServer {
 	@Override
 	public void onClientClose(WebSocket webSocket) {
 		logger.debug("onClientClose");
-		webSockets.remove(webSocket);
-		logger.debug("WebSockets set size: " + webSockets.size());
-
+		
+		clientMap.remove(webSocket);
+		logger.debug("Clients number: " + clientMap.size());
 	}
 
 	@Override
 	public void onClientMessage(WebSocket webSocket, String message) {
 		logger.debug("onClientMessage");
-		if (!webSockets.contains(webSocket)) {
-			throw new IllegalStateException("Web socket " + webSocket + " should be created befere onClienetMessage method");
+		
+		if(!clientMap.containsKey(webSocket)){
+			throw new IllegalStateException("Map of client not contains client: " + webSocket);
 		}
-
-		EntityResolver resolver = new EntityResolver(actions.keySet());
+		
+		EntityResolver resolver = new EntityResolver(entities);
 		Object entity = resolver.parse(message);
+		
+		Map<Type, Action> entityMap = clientMap.get(webSocket);
+		Action action= entityMap.get(entity.getClass());
 
 		WebsocketReply reply = new WebsocketReply(webSocket);
 		
-		ActionInvoker invoker = new ActionInvoker(actions);
+		ActionInvoker invoker = new ActionInvoker(action);
 		invoker.invoke(entity, reply);
 
 	}
@@ -55,13 +62,14 @@ public class JsonWebSocketServer extends WebSocketServer {
 	@Override
 	public void onClientOpen(WebSocket webSocket) {
 		logger.debug("onClientOpen");
-		if (webSockets.contains(webSocket)) {
-			logger.debug("WebSocket have been already stored");
-			return;
+		
+		Set<Object> controllers = EntityAction.createControllers(actionMethods);
+		Map<Type, Action> entitiesMap = EntityAction.getEntitiesMap(actionMethods, controllers);
+		if(clientMap.containsKey(webSocket)){
+			throw new IllegalStateException("Map of clients already contains client: " + webSocket);
 		}
-		webSockets.add(webSocket);
-		logger.debug("WebSockets set size: " + webSockets.size());
-
+		clientMap.put(webSocket, entitiesMap);
+		logger.debug("Clients number: " + clientMap.size());
 	}
 
 	@Override
@@ -78,17 +86,17 @@ public class JsonWebSocketServer extends WebSocketServer {
 				.scan();
 
 		for (WebSocketControllerDescription controllerDescription : controllerDescriptions) {
-			try{
-			Object webResourceObject = controllerDescription
-					.getControllerClass().getConstructor().newInstance();
-			for (ActionMethod actionMethod : controllerDescription
-					.getActionMethods()) {
-				actions.put(actionMethod.getEntity(), new Action(
-						webResourceObject, actionMethod.getMethod()));
+			try {
+				actionMethods.addAll(controllerDescription.getActionMethods());
+				//prediction one entity
+			} catch (Exception ex) {
+				logger.warn("Controller " + controllerDescription
+						+ " cannot be created");
 			}
-			} catch (Exception ex){
-				logger.warn("Controller " + controllerDescription + " cannot be created");
-			}
+		}
+		
+		for(ActionMethod actionMethod : actionMethods){
+			entities.add(actionMethod.getEntity());
 		}
 
 		super.start();

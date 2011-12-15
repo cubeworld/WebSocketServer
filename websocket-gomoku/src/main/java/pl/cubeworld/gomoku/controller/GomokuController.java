@@ -18,9 +18,16 @@ public class GomokuController {
 	
 	private Stack<WebsocketReply> waitingUsers = new Stack<WebsocketReply>();
 	
+	private double id = Math.random();
+	
 	public void connect(Connect connect, WebsocketReply reply){
 		logger.info("Game controller connect: " + connect);
 		waitingUsers.push(reply);
+		try {
+			reply.replyRaw("I'm connected :) " + id);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 		if(waitingUsers.size() >= 2){
 			startGame(waitingUsers.pop(), waitingUsers.pop(), null);
@@ -34,7 +41,6 @@ public class GomokuController {
 			user1.replyRaw("Game is started 1");
 			user2.replyRaw("Game is started 2");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
