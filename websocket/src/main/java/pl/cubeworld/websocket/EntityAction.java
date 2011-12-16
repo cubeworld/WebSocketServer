@@ -15,16 +15,18 @@ public class EntityAction {
 	private static final Logger logger = LoggerFactory
 			.getLogger(EntityAction.class);
 	
-	public static Set<Object> createControllers(List<ActionMethod> actionMethods){
+	public static Set<WebsocketController> createControllers(List<ActionMethod> actionMethods, Set<Client> clients){
 		Set<Class<?>> controllerClasses = new HashSet<Class<?>>();
 		for(ActionMethod actionMethod : actionMethods){
 			controllerClasses.add(actionMethod.getClazz());
 		}
 		
-		Set<Object> controllers = new HashSet<Object>();
+		Set<WebsocketController> controllers = new HashSet<WebsocketController>();
 		for(Class<?> controllerClass : controllerClasses){
 			try {
-				controllers.add(createObject(controllerClass));
+				WebsocketController controller = createObject(controllerClass);
+				controller.setClients(clients);
+				controllers.add(controller);
 			} catch (InstanceObjectException e) {
 				logger.warn("Controller " + controllerClass.getName() + " cannot be created");
 			}
@@ -32,9 +34,9 @@ public class EntityAction {
 		return controllers;
 	}
 
-	private static Object createObject(Class<?> controllerClass) throws InstanceObjectException {
+	private static WebsocketController createObject(Class<?> controllerClass) throws InstanceObjectException {
 		try {
-			return controllerClass.getConstructor().newInstance();
+			return (WebsocketController)controllerClass.getConstructor().newInstance();
 		} catch (IllegalArgumentException e) {
 			throw new InstanceObjectException("Object of class " + controllerClass.getName() + " cannot be created",e);
 		} catch (SecurityException e) {
@@ -50,7 +52,7 @@ public class EntityAction {
 		}
 	}
 	
-	public static Map<Type, Action> getEntitiesMap(List<ActionMethod> actionMethods, Set<Object> controllers){
+	public static Map<Type, Action> getEntitiesMap(List<ActionMethod> actionMethods, Set<WebsocketController> controllers){
 		Map<Type, Action> entities = new HashMap<Type, Action>();
 		for(ActionMethod actionMethod : actionMethods){
 			Object controller = getController(actionMethod.getClazz(), controllers);
@@ -60,7 +62,7 @@ public class EntityAction {
 		return entities;
 	}
 
-	private static Object getController(Class<?> clazz, Set<Object> controllers) {
+	private static Object getController(Class<?> clazz, Set<WebsocketController> controllers) {
 		for(Object controller : controllers){
 			if(controller.getClass() == clazz){
 				return controller;

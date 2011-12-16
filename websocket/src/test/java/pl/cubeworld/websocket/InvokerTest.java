@@ -20,16 +20,16 @@ public class InvokerTest {
 		TestController annotatedClassMocked = mock(TestController.class);
 		Book book = new Book();
 
-		Method method = TestController.class.getMethod("login", Book.class, WebsocketReply.class);
+		Method method = TestController.class.getMethod("login", Book.class, Client.class);
 		Action action = new Action(annotatedClassMocked, method);
 		
-		WebsocketReply reply = mock(WebsocketReply.class);
+		Client client = mock(Client.class);
 
 		// when
 		ActionInvoker invoker = new ActionInvoker(action);
-		invoker.invoke(book, reply);
+		invoker.invoke(book, client);
 
 		// then
-		verify(annotatedClassMocked).login(eq(book), any(WebsocketReply.class));
+		verify(annotatedClassMocked).login(eq(book), any(Client.class));
 	}
 }

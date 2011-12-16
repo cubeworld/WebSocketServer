@@ -22,8 +22,7 @@ public class JsonWebSocketServer extends WebSocketServer {
 
 	private List<ActionMethod> actionMethods = new ArrayList<ActionMethod>();
 	private Set<Type>  entities = new HashSet<Type>();
-	private Map<WebSocket, Map<Type, Action>> clientMap = new HashMap<WebSocket, Map<Type,Action>>();
-
+	private Map<Client, Map<Type, Action>> clientMap = new HashMap<Client, Map<Type,Action>>();
 
 	public JsonWebSocketServer(int port, String scannedPacket) {
 		super(port);
@@ -34,28 +33,27 @@ public class JsonWebSocketServer extends WebSocketServer {
 	public void onClientClose(WebSocket webSocket) {
 		logger.debug("onClientClose");
 		
-		clientMap.remove(webSocket);
+		clientMap.remove(new Client(webSocket));
 		logger.debug("Clients number: " + clientMap.size());
 	}
 
 	@Override
 	public void onClientMessage(WebSocket webSocket, String message) {
 		logger.debug("onClientMessage");
+		Client client = new Client(webSocket);
 		
-		if(!clientMap.containsKey(webSocket)){
+		if(!clientMap.containsKey(client)){
 			throw new IllegalStateException("Map of client not contains client: " + webSocket);
 		}
 		
 		EntityResolver resolver = new EntityResolver(entities);
 		Object entity = resolver.parse(message);
 		
-		Map<Type, Action> entityMap = clientMap.get(webSocket);
-		Action action= entityMap.get(entity.getClass());
-
-		WebsocketReply reply = new WebsocketReply(webSocket);
+		Map<Type, Action> entityMap = clientMap.get(client);
+		Action action= entityMap.get(entity.getClass());	
 		
 		ActionInvoker invoker = new ActionInvoker(action);
-		invoker.invoke(entity, reply);
+		invoker.invoke(entity, client);
 
 	}
 
@@ -63,12 +61,12 @@ public class JsonWebSocketServer extends WebSocketServer {
 	public void onClientOpen(WebSocket webSocket) {
 		logger.debug("onClientOpen");
 		
-		Set<Object> controllers = EntityAction.createControllers(actionMethods);
+		Set<WebsocketController> controllers = EntityAction.createControllers(actionMethods, clientMap.keySet());
 		Map<Type, Action> entitiesMap = EntityAction.getEntitiesMap(actionMethods, controllers);
-		if(clientMap.containsKey(webSocket)){
+		if(clientMap.containsKey(new Client(webSocket))){
 			throw new IllegalStateException("Map of clients already contains client: " + webSocket);
 		}
-		clientMap.put(webSocket, entitiesMap);
+		clientMap.put(new Client(webSocket), entitiesMap);
 		logger.debug("Clients number: " + clientMap.size());
 	}
 

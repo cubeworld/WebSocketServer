@@ -14,10 +14,10 @@ public class ActionInvoker {
 		this.action = action;
 	}
 
-	public void invoke(Object entity, WebsocketReply reply) {
+	public void invoke(Object entity, Client client) {
 		try {
 			logger.info("Invoking action for entity: " + entity.getClass().getName() + " on controller: " + action.getObject().getClass().getName());
-			Object result = action.getMethod().invoke(action.getObject(), entity, reply);
+			Object result = action.getMethod().invoke(action.getObject(), entity, client);
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
