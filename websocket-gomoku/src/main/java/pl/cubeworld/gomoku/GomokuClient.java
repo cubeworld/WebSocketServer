@@ -12,15 +12,18 @@ public class GomokuClient {
 	private final Client me;
 	private Client oponent;
 
+	private Player player;
+
 	public GomokuClient(Client client) {
 		this.me = client;
 	}
 
-	public void startGame(GomokuGame gomokuGame, Client oponent, boolean firstMove) {
+	public void startGame(GomokuGame gomokuGame, Client oponent, Player player) {
 		this.gomokuGame = gomokuGame;
 		this.oponent = oponent;
+		this.player = player;
 		try{
-		if(firstMove){
+		if(player == Player.WHITE){
 			me.sendRaw("New game. You have first move");
 		} else {
 			me.sendRaw("New game. You have to wait for openent move");
@@ -32,6 +35,10 @@ public class GomokuClient {
 
 	public Client getClient() {
 		return me;
+	}
+	
+	public Player getPlayer() {
+		return player;
 	}
 
 	@Override

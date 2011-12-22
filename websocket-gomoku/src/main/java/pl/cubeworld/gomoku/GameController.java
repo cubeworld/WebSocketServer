@@ -25,9 +25,9 @@ public class GameController {
 			GomokuClient client1 = waitingClients.poll();
 			GomokuClient client2 = client;
 			logger.debug("Creating new game client1: " + client1 + " and client2: " + client2);
-			GomokuGame game = new GomokuGame();
-			client1.startGame(game, client2.getClient(), true);
-			client2.startGame(game, client1.getClient(), false);
+			GomokuGame game = new GomokuGame(Player.WHITE,10,10);
+			client1.startGame(game, client2.getClient(), Player.WHITE);
+			client2.startGame(game, client1.getClient(), Player.BLACK);
 			return;
 		}
 		waitingClients.offer(client);
