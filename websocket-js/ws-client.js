@@ -51,12 +51,12 @@ function move(i) {
     	"x" : i,
     	"y" : i
     };
-    var move_json = JSON.stringify(move, null, 2);
+
     table[i]= mySign;
     draw();
     status("Opponent move");
 
-	ws.send(move_json);
+	sendJson("Move", move);
 }
 
 var ws;
@@ -71,9 +71,7 @@ function connect() {
 		var connectJson = {
 			"connect" : id
 		};
-		var json_text = JSON.stringify(connectJson, null, 2);
-		console.log(json_text);
-		send(json_text);
+		sendJson("Connect", connectJson);
 	};
 
 	ws.onmessage = function(e) {
@@ -115,6 +113,16 @@ function send(text) {
 		ws.send(text);
 		log("[WebSocket#send]      Send:    '" + text);
 	}
+}
+
+function sendJson(className, obj){
+    //var objJson  = JSON.stringify(obj, null, 2);
+    var entity = {
+    	    "id" : className,
+        	"data" : obj
+        };
+    var entityJson = JSON.stringify(entity, null, 2);
+    send(entityJson);
 }
 
 function disconnect() {

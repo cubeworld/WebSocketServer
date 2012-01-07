@@ -5,6 +5,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import pl.cubeworld.websocket.annotation.Book;
 import pl.cubeworld.websocket.annotation.Person;
+import pl.cubeworld.websocket.entityResolver.AutoEntityResolver;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class AdjustObjectTest {
         expectedPerson.setName("Paweł Węgrzyński");
 
         //when
-        EntityResolver adjuster = new EntityResolver(objects);
+        AutoEntityResolver adjuster = new AutoEntityResolver(objects);
 
         Person person = (Person) adjuster.parse(json);
 
@@ -50,7 +51,7 @@ public class AdjustObjectTest {
         expectedBook.setTitle("Little Princes");
 
         //when
-        EntityResolver adjuster = new EntityResolver(objects);
+        AutoEntityResolver adjuster = new AutoEntityResolver(objects);
         Book book = (Book) adjuster.parse(json);
 
         //then
@@ -70,7 +71,7 @@ public class AdjustObjectTest {
         expectedPerson.setName("Pawe� W�grzy�ski");
 
         //when
-        EntityResolver adjuster = new EntityResolver(objects);
+        AutoEntityResolver adjuster = new AutoEntityResolver(objects);
 
         Person person = (Person) adjuster.parse(json);
 
@@ -91,7 +92,7 @@ public class AdjustObjectTest {
         expectedBook.setTitle("Little Princes");
 
         //when
-        EntityResolver adjuster = new EntityResolver(objects);
+        AutoEntityResolver adjuster = new AutoEntityResolver(objects);
         Book book = (Book) adjuster.parse(json);
 
         //then
